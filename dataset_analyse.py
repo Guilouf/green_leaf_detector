@@ -4,7 +4,7 @@ from detect_green import GreenDetect
 
 directory = 'data'
 
-with open('results.csv', 'w', encoding='UTF-8', newline='') as f:
+with open('analysed/results.csv', 'w', encoding='UTF-8', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(['DOSSIER', 'RATIO surface VERT/AUTRE'])
 
@@ -12,4 +12,8 @@ with open('results.csv', 'w', encoding='UTF-8', newline='') as f:
         for filename in files:
             complete_name = os.path.join(root, filename)
             analysed = GreenDetect(complete_name)
+
+            # save "green" image to another folder, with existing sub-folders
+            analysed.save_green_image(os.path.join('analysed', root), f'{filename}')
+
             writer.writerow([complete_name, analysed.pixel_ratio])

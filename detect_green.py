@@ -1,5 +1,6 @@
 import numpy
 from PIL import Image
+import os
 
 
 class GreenDetect:
@@ -54,6 +55,14 @@ class GreenDetect:
         self.rgb_nump[green] = [0, 255, 0]
         img = Image.fromarray(self.rgb_nump)
         img.show()
+
+    def save_green_image(self, folder, filename):
+        green = numpy.where(self.conditions)
+        self.rgb_nump[green] = [0, 255, 0]
+        img = Image.fromarray(self.rgb_nump)
+        if os.path.exists(folder) is False:
+            os.makedirs(folder)
+        img.save(os.path.join(folder, filename))
 
 
 if __name__ == "__main__":
