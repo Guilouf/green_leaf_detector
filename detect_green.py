@@ -1,40 +1,50 @@
 import numpy
 from PIL import Image
 
-rgb_im = Image.open('data/test_tom.jpeg').convert('RGB')
-hsv_im = rgb_im.convert('HSV')
 
-rgb_nump = numpy.asarray(rgb_im)
-hsv_nump = numpy.asarray(hsv_im)
+class GreenDetect:
 
-# Extract Hue
-H = hsv_nump[:, :, 0]
+    # Hue threshold values (rescaled from 360° to uint8)
+    lo = int((70 * 255) / 360)
+    hi = int((120 * 255) / 360)
 
-# Extract saturation
-S = hsv_nump[:, :, 1]
+    # Saturation threshold
+    sat_thres = 10
 
-# Extract Value (brightness)
-B = hsv_nump[:, :, 2]
+    # Brightness threshold
+    bright_thres = 50
 
-# Find all green pixels, i.e. where 100 < Hue < 140
-lo, hi = 70, 120
+    def __init__(self, filename):
+        rgb_im = Image.open(filename).convert('RGB')
+        hsv_im = rgb_im.convert('HSV')
 
-# Rescale to 0-255, rather than 0-360 because we are using uint8
-lo = int((lo * 255) / 360)
-hi = int((hi * 255) / 360)
+        rgb_nump = numpy.asarray(rgb_im)
+        hsv_nump = numpy.asarray(hsv_im)
 
-conditions = (H > lo) & (H < hi) & (S > 10) & (B > 50)
-green = numpy.where(conditions)
+        # Extract Hue
+        h = hsv_nump[:, :, 0]
+
+        # Extract saturation
+        s = hsv_nump[:, :, 1]
+
+        # Extract Value (brightness)
+        b = hsv_nump[:, :, 2]
+
+        conditions = (h > self.lo) & (h < self.hi) & (s > self.sat_thres) & (b > self.bright_thres)
+        green = numpy.where(conditions)
+
+        green_pixel_number = numpy.count_nonzero(conditions)
+        total_pixel_number = rgb_nump.shape[0] * rgb_nump.shape[1]
+        print(green_pixel_number, total_pixel_number, green_pixel_number / total_pixel_number)
+
+        # Binary image
+        Image.fromarray(conditions).show()
+
+        # Green colored image
+        rgb_nump[green] = [0, 255, 0]
+        img = Image.fromarray(rgb_nump)
+        img.show()
 
 
-green_pixel_number = numpy.count_nonzero(conditions)
-total_pixel_number = rgb_nump.shape[0] * rgb_nump.shape[1]
-print(green_pixel_number, total_pixel_number, green_pixel_number / total_pixel_number)
-
-# Binary image
-Image.fromarray(conditions).show()
-
-# Green colored image
-rgb_nump[green] = [0, 255, 0]
-img = Image.fromarray(rgb_nump)
-img.show()
+if __name__ == "__main__":
+    GreenDetect('data/test_tom.jpeg')
