@@ -6,13 +6,13 @@ class GreenDetect:
 
     # Hue threshold values (rescaled from 360° to uint8)
     lo = int((70 * 255) / 360)
-    hi = int((120 * 255) / 360)
+    hi = int((150 * 255) / 360)
 
     # Saturation threshold
-    sat_thres = 10
+    sat_thres = 30
 
     # Brightness threshold
-    bright_thres = 50
+    bright_thres = 20
 
     def __init__(self, filename):
         rgb_im = Image.open(filename).convert('RGB')
