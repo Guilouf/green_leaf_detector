@@ -22,11 +22,19 @@ lo, hi = 70, 120
 # Rescale to 0-255, rather than 0-360 because we are using uint8
 lo = int((lo * 255) / 360)
 hi = int((hi * 255) / 360)
-green = numpy.where((H > lo) & (H < hi) & (S > 10) & (B > 50))
+
+conditions = (H > lo) & (H < hi) & (S > 10) & (B > 50)
+green = numpy.where(conditions)
 
 
+green_pixel_number = numpy.count_nonzero(conditions)
+total_pixel_number = rgb_nump.shape[0] * rgb_nump.shape[1]
+print(green_pixel_number, total_pixel_number, green_pixel_number / total_pixel_number)
+
+# Binary image
+Image.fromarray(conditions).show()
+
+# Green colored image
 rgb_nump[green] = [0, 255, 0]
-
-
 img = Image.fromarray(rgb_nump)
 img.show()
