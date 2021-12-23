@@ -18,7 +18,7 @@ class GreenDetect:
         rgb_im = Image.open(filename).convert('RGB')
         hsv_im = rgb_im.convert('HSV')
 
-        rgb_nump = numpy.asarray(rgb_im)
+        self.rgb_nump = numpy.asarray(rgb_im)
         hsv_nump = numpy.asarray(hsv_im)
 
         # Extract Hue
@@ -30,19 +30,29 @@ class GreenDetect:
         # Extract Value (brightness)
         b = hsv_nump[:, :, 2]
 
-        conditions = (h > self.lo) & (h < self.hi) & (s > self.sat_thres) & (b > self.bright_thres)
-        green = numpy.where(conditions)
+        self.conditions = (h > self.lo) & (h < self.hi) & (s > self.sat_thres) & (b > self.bright_thres)
 
-        green_pixel_number = numpy.count_nonzero(conditions)
-        total_pixel_number = rgb_nump.shape[0] * rgb_nump.shape[1]
-        print(green_pixel_number, total_pixel_number, green_pixel_number / total_pixel_number)
+    @property
+    def pixel_ratio(self):
+        """Ratio between green pixels and the total amount of pixels from the input image"""
+        return self.green_pixels_number / self.total_pixels_number
 
-        # Binary image
-        Image.fromarray(conditions).show()
+    @property
+    def green_pixels_number(self):
+        return numpy.count_nonzero(self.conditions)
 
-        # Green colored image
-        rgb_nump[green] = [0, 255, 0]
-        img = Image.fromarray(rgb_nump)
+    @property
+    def total_pixels_number(self):
+        return self.rgb_nump.shape[0] * self.rgb_nump.shape[1]
+
+    def show_binary_image(self):
+        Image.fromarray(self.conditions).show()
+
+    def show_green_image(self):
+        """rgb image in which all affiliated green pixels are turned into pure green"""
+        green = numpy.where(self.conditions)
+        self.rgb_nump[green] = [0, 255, 0]
+        img = Image.fromarray(self.rgb_nump)
         img.show()
 
 
